@@ -1,4 +1,4 @@
-// one of my own soluition avoiding explicit induction.
+// one of my own soluition avoiding self reference (some wierd induction).
 function add(x:nat, y:nat): nat
 {
   if(y == 0) then x
