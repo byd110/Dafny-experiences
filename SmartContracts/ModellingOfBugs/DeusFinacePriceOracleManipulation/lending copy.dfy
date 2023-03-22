@@ -40,29 +40,30 @@ class LendingContract  {
   //   WETHBanlance * USDCBanlance == inv
   // }
 
-  method liquidate(user : Address, msg: Msg)
+  method liquidate_pay(user : Address, msg: Msg)
     requires user in debt
     requires user in collateral
     requires getPrice() as nat * debt[user] as nat /100 * 80 < collateral[user] as nat
     requires msg.sender in USDC
     requires USDC[msg.sender] >= debt[user]
     requires "WETH" in pair && pair["WETH"] > collateral[user]
-
     // requires Ginv()
 
     modifies this
 
     // ensures Ginv()
+
   {
     assume("USDC" in pair && pair["USDC"] > 0);
     assume(pair["USDC"] as nat + debt[user]as nat < MAX_UINT256);
     assume((if msg.sender in WETH then WETH[msg.sender] else 0) as nat + collateral[user] as nat < MAX_UINT256);
     USDC := USDC[msg.sender := USDC[msg.sender] - debt[user]];
     pair := pair["USDC" := pair["USDC"] + debt[user]];
-    WETH := WETH[msg.sender := (if msg.sender in WETH then WETH[msg.sender] else 0) + collateral[user]];
-    pair := pair["WETH" := pair["WETH"] - collateral[user]];
+    if(!msg.sender.ongoing())
+    {WETH := WETH[msg.sender := (if msg.sender in WETH then WETH[msg.sender] else 0) + collateral[user]];
+     pair := pair["WETH" := pair["WETH"] - collateral[user]];}
   }
-
+  method test()
   function getPrice() : uint256
     reads this
   {

@@ -23,6 +23,10 @@ trait {:termination false} Account {
 
   /** Type of account. */
   const isContract: bool
+
+  var processing: nat
+
+  predicate ongoing() reads this {processing != 0}
 }
 
 /** A user account. */
