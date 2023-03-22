@@ -59,11 +59,12 @@ class LendingContract  {
     assume((if msg.sender in WETH then WETH[msg.sender] else 0) as nat + collateral[user] as nat < MAX_UINT256);
     USDC := USDC[msg.sender := USDC[msg.sender] - debt[user]];
     pair := pair["USDC" := pair["USDC"] + debt[user]];
-    if(!msg.sender.ongoing())
-    {WETH := WETH[msg.sender := (if msg.sender in WETH then WETH[msg.sender] else 0) + collateral[user]];
-     pair := pair["WETH" := pair["WETH"] - collateral[user]];}
+    // if(!msg.sender.ongoing())
+    assert(!msg.sender.ongoing());
+    WETH := WETH[msg.sender := (if msg.sender in WETH then WETH[msg.sender] else 0) + collateral[user]];
+    pair := pair["WETH" := pair["WETH"] - collateral[user]];
   }
-  method test()
+
   function getPrice() : uint256
     reads this
   {
