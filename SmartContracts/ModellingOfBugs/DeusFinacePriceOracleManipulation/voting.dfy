@@ -44,7 +44,7 @@ class Vote {
     modifies this
   {
 
-    votingToken := votingToken[msg.sender :=(if msg.sender in votingToken then votingToken[msg.sender] else 0) + amount];
+    votingToken := votingToken[msg.sender :=(if msg.sender in votingToken then votingToken[msg.sender] else 0) + amount]; // transfer from sender to this contract using token's method.
     totalamount := totalamount + amount as nat;
   }
 

@@ -74,7 +74,7 @@ class Lottery {
     var totalAmount : uint := 0;
     var i := 0;
     assume(|amounts| >= |ids|);
-    assert(drawingPhase == false);
+    assert(drawingPhase == false); // make sure it's buying phase.
     while i < |ids| {
       var index : uint128 := ids[i];
       var amount : uint := amounts[i];

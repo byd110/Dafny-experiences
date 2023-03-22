@@ -60,7 +60,7 @@ class LendingContract  {
     USDC := USDC[msg.sender := USDC[msg.sender] - debt[user]];
     pair := pair["USDC" := pair["USDC"] + debt[user]];
     // if(!msg.sender.ongoing())
-    assert(!msg.sender.ongoing());
+    assert(!msg.sender.ongoing());//make sure there is no ongoing (possible flash loans) transactions.
     WETH := WETH[msg.sender := (if msg.sender in WETH then WETH[msg.sender] else 0) + collateral[user]];
     pair := pair["WETH" := pair["WETH"] - collateral[user]];
   }
