@@ -70,11 +70,12 @@ class Lottery {
 
     requires winningId == 0
     modifies this
+    ensures drawingPhase == false
   {
     var totalAmount : uint := 0;
     var i := 0;
     assume(|amounts| >= |ids|);
-    assert(drawingPhase == false); // make sure it's buying phase.
+    // assert(); // make sure it's buying phase.
     while i < |ids| {
       var index : uint128 := ids[i];
       var amount : uint := amounts[i];

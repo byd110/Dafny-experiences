@@ -19,66 +19,64 @@ include "./Contract.dfy"
 import opened NonNativeTypes
 
 datatype Msg = Msg(sender: Account, value: uint256)
+datatype Try<T> = Success(v: T) | Revert()
 
 type Address = Account
 
 class LendingContract  {
-  var WETH : map<Address,uint256>;
-  var USDC : map<Address,uint256>;
-  // ghost var WETHBanlance : nat;
-  // ghost var USDCBanlance : nat;
-  // ghost var inv : nat;
-  var pair : map<string, uint256>; // USDC - WETH
-  // debt --> USDC, collateral --> WETH
-  var debt : map<Address , uint256>;
-  var collateral : map<Address , uint256>;
 
-  // predicate Ginv()
-  //   reads this`WETHBanlance, this`USDCBanlance, this`inv
-  //   requires WETHBanlance as nat * USDCBanlance as nat <= MAX_UINT256
+  var collateral : nat;
+  // var reservetime : real;
+  // var lastprice1 : nat;
+  // var lastprice2 : nat;
+  // var positive : bool;
+
+  function method customized_price (data1 : nat, data2 : nat) : nat
+    requires data2 != 0
+  {
+    data1 / data2
+  }
+
+  // function method customized_price2 (data1 : nat, data2 : nat) : nat
+  //   requires data2 != 0
+  //   requires reservetime.Floor >= 0
+  //   reads this
   // {
-  //   WETHBanlance * USDCBanlance == inv
+  //   (((lastprice1 as real - data1 as real)  * reservetime + lastprice1 as real)/((lastprice2 as real - data2 as real)  * reservetime + lastprice2 as real)).Floor as nat
   // }
 
-  method liquidate_pay(user : Address, msg: Msg)
-    requires user in debt
-    requires user in collateral
-    requires getPrice() as nat * debt[user] as nat /100 * 80 < collateral[user] as nat
-    requires msg.sender in USDC
-    requires USDC[msg.sender] >= debt[user]
-    requires "WETH" in pair && pair["WETH"] > collateral[user]
-    // requires Ginv()
+  method getdata1() returns (data1 : nat)
+    ensures data1 != 0
+  {data1 := havoc();}
+
+  method getdata2() returns (data2 : nat)
+    ensures data2 != 0
+  {data2 := havoc();}
+
+  // predicate mutate(data1: nat, data2 : nat, r1: Try<()>, amount :nat)
+  // {
+  //   transactions(amount, data1 * mutation(), data2 / mutation()) == r1
+  // }
+
+  method transactions(amount : nat, data1 : nat, data2 : nat) returns (r1: Try<()>, price : nat)
+    requires data2 != 0
 
     modifies this
 
-    // ensures Ginv()
+    ensures  r1.Revert? ==> forall m : nat :: 0 < m < 10 ==> customized_price(data1* m,(if data2/m == 0 then 1 else data2/m)) * collateral < amount
 
   {
-    assume("USDC" in pair && pair["USDC"] > 0);
-    assume(pair["USDC"] as nat + debt[user]as nat < MAX_UINT256);
-    assume((if msg.sender in WETH then WETH[msg.sender] else 0) as nat + collateral[user] as nat < MAX_UINT256);
-    USDC := USDC[msg.sender := USDC[msg.sender] - debt[user]];
-    pair := pair["USDC" := pair["USDC"] + debt[user]];
-    // if(!msg.sender.ongoing())
-    assert(!msg.sender.ongoing());//make sure there is no ongoing (possible flash loans) transactions.
-    WETH := WETH[msg.sender := (if msg.sender in WETH then WETH[msg.sender] else 0) + collateral[user]];
-    pair := pair["WETH" := pair["WETH"] - collateral[user]];
-  }
+    collateral := havoc();
+    price := customized_price(data1,data2);
+    if (price * collateral < amount)
+    {
+      r1 := Revert();
 
-  function getPrice() : uint256
-    reads this
-  {
-    assume("USDC" in pair);
-    assume("WETH" in pair);
-    if (pair["USDC"] != 0 && pair["WETH"] != 0 )then pair["USDC"]/ pair["WETH"] else 0 // also need to consider the case of zeros in balances
+    }
+    else
+    {r1 := Success(());}
   }
-
-  // constructor(w: Token, u : Token, p : map<Token , uint256>, d: map<Address , uint256>, c : map<Address , uint256>, usdcinitial : uint256, wethinitial : uint256)
-  //   ensures  USDC in pair
-  //   ensures  WETH in pair
-  // {
-  //   WETH, USDC, debt, collateral := w, u,  d, c;
-  //   pair := p[w := usdcinitial][u := usdcinitial];
-  // }
 }
 
+method {:extern} havoc() returns (a: nat)
+  ensures a != 0
