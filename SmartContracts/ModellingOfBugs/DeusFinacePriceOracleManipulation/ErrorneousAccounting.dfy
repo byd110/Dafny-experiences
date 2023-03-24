@@ -30,13 +30,14 @@ class errorneous
   method swap(amount1Out : real, to : errorneous)
     requires this in token0 && this in token1
     requires token1[this] == reserve1
-    requires reserve0 + amount0Out == token0[this]
+    requires reserve0 - amount0Out == token0[this] && reserve0 > amount0Out >= 0.0
+    requires amount0Out > 0.0 && reserve1 > 0.0 && reserve0 > 0.0
 
     modifies this
 
-    ensures reserve0 * reserve1 >= old(reserve0) * old(reserve1) * 10000.0
+    ensures reserve0 * reserve1 >= old(reserve0) * old(reserve1)
   {
-    if(amount1Out <= token1[this])
+    if(0.0 < amount1Out < token1[this])
     {
       token1 := token1[this := token1[this] - amount1Out];
       token0 := token0[this := havoc()];
@@ -52,3 +53,4 @@ class errorneous
 }
 
 function method {:extern} havoc() : real
+  ensures havoc() > 0.0
