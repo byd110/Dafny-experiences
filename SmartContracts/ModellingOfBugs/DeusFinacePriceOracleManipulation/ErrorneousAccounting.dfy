@@ -49,9 +49,9 @@ class errorneous
     token1 := transfer(token1, amount1Out, to,  this.m_address);
     token0 := uniswapCall(to);
     var balance0, balance1 := token0[this.m_address], token1[this.m_address];
-    var amount0in : int := balance0 - (reserve0 - amount0Out);
-    var balance0Adj : int := balance0 * 10000 - amount0in * 22;
-    if(balance0Adj * balance1 >= reserve0 * reserve1 * 10000)
+    var amount0in : nat := if reserve0 - amount0Out > balance0 then 0 else balance0 - (reserve0 - amount0Out); /*in smart contract, the negative assignment to a uint variable will assign the variable to 0.*/
+    var balance0Adj : nat := balance0 * 10000 - amount0in * 22; 
+    if(balance0Adj * balance1 >= reserve0 * reserve1 * 1000)
     {reserve0, reserve1 := balance0, balance1;}
   }
 
