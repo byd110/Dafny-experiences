@@ -67,15 +67,15 @@ class LendingContract  {
     var m : real := mut();
     data1m := token1 * m;
     data2m := token2 / m;
-    calc
-    {
-      inv;
-      token1 * token2;
-      token1 * m * token2 / m;
-      (token1 * m) * (token2 / m);
-      data1m * data2m;
-      inv;
-    }
+    // calc
+    // {
+    //   inv;
+    //   token1 * token2;
+    //   token1 * m * token2 / m;
+    //   (token1 * m) * (token2 / m);
+    //   data1m * data2m;
+    //   inv;
+    // }
     update(data1m, data2m);
   }
 
@@ -99,8 +99,8 @@ class LendingContract  {
   // }
 
   method transactions(amount : real, data1 : real, data2 : real) returns (r1: Try<()>, price : real, mutationPrice : real)
-    requires data2 != 0.0
     requires valid()
+    requires data2 != 0.0
 
     modifies this
 
@@ -108,6 +108,7 @@ class LendingContract  {
     // ensures price ==
 
   {
+    // var data1:real, data2:real := inquire();
     assume(data1 * data2 == inv);
     update(data1, data2);
     collateral := havoc();
@@ -126,6 +127,14 @@ class LendingContract  {
       mutationPrice := 0.0;
     }
   }
+
+  // method inquire() returns (data1 : real, data2 : real)
+  // requires valid()
+
+  // ensures valid()
+  // {
+    
+  // }
 
   // lemma mutation(data1 : real, data2: real)
   //   requires m != 0.0

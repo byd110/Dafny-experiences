@@ -73,3 +73,4 @@ lemma mapAddVoting(m: map<Address, uint256>, k: Address, v: nat)
   //  m ++ [k, v] is m with the value at k incremented by v (0 is not in key)
   //  sum(m ++ [k,v]) == sum(m) + v
   ensures sum(m[k := ((if k in m then m[k] else 0) as nat + v) as uint256]) >= sum(m) + v
+
