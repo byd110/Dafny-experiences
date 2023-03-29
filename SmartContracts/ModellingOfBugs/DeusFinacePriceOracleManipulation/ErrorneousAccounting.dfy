@@ -21,9 +21,12 @@
 // datatype Msg = Msg(sender: Account, value: uint256)
 
 // type Address = Account
+
 class address {
+  // We use this class to represent the address and implement the transfer function.
   var m_address: nat;
 }
+
 class errorneous
 {
   var k : nat; //product invariant
@@ -36,7 +39,7 @@ class errorneous
     requires to in token0 && to in token1
     requires token1[this.m_address] ==  reserve1
     requires reserve0 - amount0Out == token0[this.m_address]
-    requires amount0Out == 0 //since we don't understand what this var is, we set it to 0.
+    requires amount0Out == 0 //since we don't understand what this variable represents, we set it to 0.
     requires amount1Out <= token1[this.m_address]
     requires reserve1 > 0 && reserve0 > 0
     requires reserve0 * reserve1 == k
@@ -50,7 +53,7 @@ class errorneous
     token0 := uniswapCall(to);
     var balance0, balance1 := token0[this.m_address], token1[this.m_address];
     var amount0in : nat := if reserve0 - amount0Out > balance0 then 0 else balance0 - (reserve0 - amount0Out); /*in smart contract, the negative assignment to a uint variable will assign the variable to 0.*/
-    var balance0Adj : nat := balance0 * 10000 - amount0in * 22; 
+    var balance0Adj : nat := balance0 * 10000 - amount0in * 22;
     if(balance0Adj * balance1 >= reserve0 * reserve1 * 1000)
     {reserve0, reserve1 := balance0, balance1;}
   }
@@ -58,8 +61,6 @@ class errorneous
   method uniswapCall(to: address) returns (newt : map<address, nat>)
     requires to in token0 && this.m_address in token0
     requires this.m_address in token1
-    // requires t[to] >= amount
-    // modifies this
     ensures to in token0 && this.m_address in token0
     ensures this.m_address in newt
     ensures reserve0 == old(reserve0) && reserve1 == old(reserve1)
@@ -73,7 +74,6 @@ class errorneous
     requires to in t && from in t
     requires t[from] >= amount
     ensures from in newt && to in newt
-    // ensures from != to ==> newt[from] == old(t)[from] - amount 
   {
     newt := t[from := t[from] - amount];
     newt := newt[to := t[to] + amount];
@@ -82,6 +82,8 @@ class errorneous
   {
     m_address := a;
   }
+
+
 }
 
 
